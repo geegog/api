@@ -1,5 +1,7 @@
 package com.icefire.api.user.application.service;
 
+import com.icefire.api.common.application.exception.UserNotCreatedException;
+import com.icefire.api.common.application.exception.UserNotFoundException;
 import com.icefire.api.common.infrastructure.security.KeyGenerator;
 import com.icefire.api.user.application.dto.UserDTO;
 import com.icefire.api.user.domain.model.User;
@@ -37,19 +39,18 @@ public class UserService {
         return userEntity.orElse(null);
     }
 
-    public UserDTO addUser(UserDTO userDTO) {
-        User user = new User();
-        user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
-        user.setUsername(userDTO.getUsername());
-        user.setPublicKey(KeyGenerator.keyPairGenerator(userDTO.getUsername()));
+    public UserDTO addUser(UserDTO userDTO) throws UserNotCreatedException {
 
-        User userEntity = null;
+        User userEntity;
         try {
+            User user = new User();
+            user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+            user.setUsername(userDTO.getUsername());
+            user.setPublicKey(KeyGenerator.keyPairGenerator(userDTO.getUsername()));
             userEntity = userRepository.save(user);
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new UserNotCreatedException(userDTO, e.getCause());
         }
-
 
         return userAssembler.toResource(userEntity);
     }

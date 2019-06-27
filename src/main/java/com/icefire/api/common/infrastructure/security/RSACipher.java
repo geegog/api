@@ -12,17 +12,17 @@ import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 
-public class AESCipher {
+public class RSACipher {
 
-    private static final String ALGORITHM_RC4 = "RSA/ECB/PKCS1Padding";
+    private static final String ALGORITHM_RSA = "RSA/ECB/PKCS1Padding";
     private Key key;
 
     /**
-     * Create AESCipher based on existing {@link Key}
+     * Create RSACipher based on existing {@link Key}
      *
      * @param key Key
      */
-    public AESCipher(Key key) {
+    public RSACipher(Key key) {
         this.key = key;
     }
 
@@ -35,7 +35,7 @@ public class AESCipher {
     public String getEncryptedMessage(String message) {
         String encValBase64 = null;
         try {
-            Cipher cipher = Cipher.getInstance(ALGORITHM_RC4);
+            Cipher cipher = Cipher.getInstance(ALGORITHM_RSA);
             cipher.init(Cipher.ENCRYPT_MODE, key);
             byte[] encryptedTextBytes = cipher.doFinal(message.getBytes());
             encValBase64 = BaseEncoding.base64().encode(encryptedTextBytes);
@@ -55,7 +55,7 @@ public class AESCipher {
 
         String decValBase64 = null;
         try {
-            Cipher cipher = Cipher.getInstance(ALGORITHM_RC4);
+            Cipher cipher = Cipher.getInstance(ALGORITHM_RSA);
             cipher.init(Cipher.DECRYPT_MODE, key);
             byte[] encryptedTextBytes = BaseEncoding.base64().decode(message);
             byte[] decryptedTextBytes = cipher.doFinal(encryptedTextBytes);
