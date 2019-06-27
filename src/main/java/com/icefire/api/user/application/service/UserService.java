@@ -32,6 +32,11 @@ public class UserService {
         return userEntity.orElse(null);
     }
 
+    public User getUser(Long id) {
+        Optional<User> userEntity = userRepository.findById(id);
+        return userEntity.orElse(null);
+    }
+
     public UserDTO addUser(UserDTO userDTO) {
         User user = new User();
         user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
