@@ -17,13 +17,8 @@ public class UserRestController {
     UserService userService;
 
     @PostMapping("/register")
-    public ResponseEntity<?> transfer(@RequestBody UserDTO userDTO) throws Exception {
+    public ResponseEntity<?> transfer(@RequestBody UserDTO userDTO) {
         return new ResponseEntity<>(userService.addUser(userDTO), HttpStatus.OK);
-    }
-
-    @GetMapping("/all")
-    public ResponseEntity<?> all() throws Exception {
-        return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
     }
 
 }

@@ -14,6 +14,8 @@ public class UserDTO extends ResourceSupport {
 
     private String username;
 
+    private String publicKey;
+
     private LocalDateTime created;
 
     private LocalDateTime updated;

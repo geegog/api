@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.mvc.ResourceAssemblerSupport;
 import org.springframework.stereotype.Service;
 
+import java.util.Base64;
+
 @Service
 public class UserAssembler extends ResourceAssemblerSupport<User, UserDTO> {
 
@@ -27,6 +29,7 @@ public class UserAssembler extends ResourceAssemblerSupport<User, UserDTO> {
         dto.setPassword(user.getPassword());
         dto.setUsername(user.getUsername());
         dto.setUpdated(user.getUpdated());
+        dto.setPublicKey(Base64.getEncoder().encodeToString(user.getPublicKey()));
 
         return dto;
     }

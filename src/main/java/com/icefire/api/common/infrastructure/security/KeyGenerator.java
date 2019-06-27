@@ -8,6 +8,8 @@ import java.nio.file.Paths;
 import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
+import java.util.Base64;
 
 import static java.lang.System.out;
 
@@ -21,8 +23,8 @@ public class KeyGenerator {
             KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
             kpg.initialize(2048);
             KeyPair kp = kpg.generateKeyPair();
-            Key pub = kp.getPublic();
-            Key pvt = kp.getPrivate();
+            PublicKey pub = kp.getPublic(); // X.509 format
+            PrivateKey pvt = kp.getPrivate(); // PKCS#8 format
 
             //safe private
             savePrivateKeyToFile(pvt, username);
@@ -34,7 +36,7 @@ public class KeyGenerator {
         return publicKeyBytes;
     }
 
-    public static byte[] getPrivateKey(String username) {
+    public static PrivateKey getPrivateKey(String username) {
         byte[] privateKeyBytes = new byte[0];
         try {
             /* Read all bytes from the private key file */
@@ -44,18 +46,30 @@ public class KeyGenerator {
             /* Generate private key. */
             PKCS8EncodedKeySpec ks = new PKCS8EncodedKeySpec(bytes);
             KeyFactory kf = KeyFactory.getInstance("RSA");
-            PrivateKey pvt = kf.generatePrivate(ks);
+            return kf.generatePrivate(ks);
 
-            privateKeyBytes = pvt.getEncoded();
         } catch (NoSuchAlgorithmException | IOException | InvalidKeySpecException e) {
             e.printStackTrace();
         }
 
-        return privateKeyBytes;
+        return null;
 
     }
 
-    private static void savePrivateKeyToFile(Key privateKey, String username) {
+    public static PublicKey getPublicKey(String base64PublicKey){
+        PublicKey publicKey;
+        try{
+            X509EncodedKeySpec keySpec = new X509EncodedKeySpec(Base64.getDecoder().decode(base64PublicKey.getBytes()));
+            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+            publicKey = keyFactory.generatePublic(keySpec);
+            return publicKey;
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private static void savePrivateKeyToFile(PrivateKey privateKey, String username) {
         try {
             PrintStream out = new PrintStream(PATH + username + "_" + ".key");
             out.write(privateKey.getEncoded());

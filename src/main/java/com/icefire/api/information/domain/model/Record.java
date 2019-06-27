@@ -12,6 +12,7 @@ import javax.persistence.*;
 @Entity
 public class Record extends BaseEntity {
 
+    @Column(length = 512)
     private String value;
 
     @ManyToOne

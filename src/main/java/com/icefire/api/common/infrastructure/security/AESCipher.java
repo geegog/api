@@ -10,19 +10,20 @@ import javax.crypto.spec.SecretKeySpec;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
 
 public class AESCipher {
 
-    private static final String ALGORITHM_AES256 = "AES/CBC/PKCS5Padding";
-    private byte[] keyValue;
+    private static final String ALGORITHM_RC4 = "RSA/ECB/PKCS1Padding";
+    private Key key;
 
     /**
      * Create AESCipher based on existing {@link Key}
      *
      * @param key Key
      */
-    public AESCipher(byte[] key) {
-        keyValue = key;
+    public AESCipher(Key key) {
+        this.key = key;
     }
 
     /**
@@ -32,11 +33,9 @@ public class AESCipher {
      * @return String Base64 encoded
      */
     public String getEncryptedMessage(String message) {
-        Key key = getKey();
-
         String encValBase64 = null;
         try {
-            Cipher cipher = Cipher.getInstance(ALGORITHM_AES256);
+            Cipher cipher = Cipher.getInstance(ALGORITHM_RC4);
             cipher.init(Cipher.ENCRYPT_MODE, key);
             byte[] encryptedTextBytes = cipher.doFinal(message.getBytes());
             encValBase64 = BaseEncoding.base64().encode(encryptedTextBytes);
@@ -53,11 +52,10 @@ public class AESCipher {
      * @return String
      */
     public String getDecryptedMessage(String message) {
-        Key key = getKey();
 
         String decValBase64 = null;
         try {
-            Cipher cipher = Cipher.getInstance(ALGORITHM_AES256);
+            Cipher cipher = Cipher.getInstance(ALGORITHM_RC4);
             cipher.init(Cipher.DECRYPT_MODE, key);
             byte[] encryptedTextBytes = BaseEncoding.base64().decode(message);
             byte[] decryptedTextBytes = cipher.doFinal(encryptedTextBytes);
@@ -66,15 +64,6 @@ public class AESCipher {
             e.printStackTrace();
         }
         return decValBase64;
-    }
-
-    /**
-     * Get key
-     *
-     * @return Key
-     */
-    private Key getKey() {
-        return new SecretKeySpec(keyValue, ALGORITHM_AES256);
     }
 
 
