@@ -1,6 +1,7 @@
 package com.icefire.api.information.domain.model;
 
 import com.icefire.api.common.domain.BaseEntity;
+import com.icefire.api.user.domain.model.User;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

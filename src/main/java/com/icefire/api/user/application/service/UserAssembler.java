@@ -1,7 +1,7 @@
-package com.icefire.api.information.application.service;
+package com.icefire.api.user.application.service;
 
-import com.icefire.api.information.application.dto.UserDTO;
-import com.icefire.api.information.domain.model.User;
+import com.icefire.api.user.application.dto.UserDTO;
+import com.icefire.api.user.domain.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.mvc.ResourceAssemblerSupport;
 import org.springframework.stereotype.Service;

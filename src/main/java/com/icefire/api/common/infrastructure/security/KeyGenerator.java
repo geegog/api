@@ -1,6 +1,5 @@
-package com.icefire.api.information.application.security;
+package com.icefire.api.common.infrastructure.security;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Files;
@@ -58,7 +57,7 @@ public class KeyGenerator {
 
     private static void savePrivateKeyToFile(Key privateKey, String username) {
         try {
-            PrintStream out = new java.io.PrintStream(PATH + username + "_" + ".key");
+            PrintStream out = new PrintStream(PATH + username + "_" + ".key");
             out.write(privateKey.getEncoded());
         } catch (IOException e) {
             e.printStackTrace();

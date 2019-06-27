@@ -1,4 +1,4 @@
-package com.icefire.api.information.application.dto;
+package com.icefire.api.user.application.dto;
 
 import com.icefire.api.common.rest.ResourceSupport;
 import lombok.Data;

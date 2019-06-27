@@ -1,4 +1,4 @@
-package com.icefire.api.information.application.security;
+package com.icefire.api.common.infrastructure.security;
 
 import com.google.common.io.BaseEncoding;
 
