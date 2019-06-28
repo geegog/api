@@ -71,12 +71,11 @@ public class KeyGenerator {
 
     private static void savePrivateKeyToFile(PrivateKey privateKey, String username) {
         try {
-            PrintStream out = new PrintStream(PATH + username + "_" + ".key");
-            out.write(privateKey.getEncoded());
+            Path path = Paths.get(PATH + username + "_" + ".key");
+            Files.write(path, privateKey.getEncoded());
         } catch (IOException e) {
             e.printStackTrace();
         }
-        out.close();
     }
 
 }
