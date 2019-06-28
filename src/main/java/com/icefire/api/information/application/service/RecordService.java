@@ -1,6 +1,7 @@
 package com.icefire.api.information.application.service;
 
 import com.google.common.base.Throwables;
+import com.icefire.api.common.application.exception.BadValueException;
 import com.icefire.api.common.application.exception.RecordNotFoundException;
 import com.icefire.api.common.application.exception.UserNotFoundException;
 import com.icefire.api.common.infrastructure.security.RSACipher;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.time.LocalDateTime;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
@@ -89,6 +91,7 @@ public class RecordService {
         }
 
         record.setValue(encryptedMessage);
+        record.setUpdated(LocalDateTime.now());
 
         Record recordEntity = null;
         try {
@@ -100,13 +103,17 @@ public class RecordService {
         return recordAssembler.toResource(recordEntity);
     }
 
-    public RecordDTO decrypt(String value, PrivateKey privateKey, Long id) throws RecordNotFoundException {
+    public RecordDTO decrypt(String value, PrivateKey privateKey, Long id) throws RecordNotFoundException, BadValueException {
         RSACipher rsaCipher = new RSACipher(privateKey);
 
         RecordDTO record = recordAssembler.toResource(recordRepository.findById(id).orElse(null));
 
         if (record == null) {
             throw new RecordNotFoundException(id, Throwables.getRootCause(new Throwable("Record does not exist!")));
+        }
+
+        if (!value.equalsIgnoreCase(record.getValue())) {
+            throw new BadValueException();
         }
 
         record.setValue(rsaCipher.getDecryptedMessage(value));

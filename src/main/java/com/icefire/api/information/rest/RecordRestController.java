@@ -1,5 +1,6 @@
 package com.icefire.api.information.rest;
 
+import com.icefire.api.common.application.exception.BadValueException;
 import com.icefire.api.common.application.exception.RecordNotFoundException;
 import com.icefire.api.common.application.exception.UserNotFoundException;
 import com.icefire.api.common.infrastructure.security.KeyGenerator;
@@ -74,6 +75,9 @@ public class RecordRestController {
         } catch (RecordNotFoundException e) {
             throw new ResponseStatusException(
                     HttpStatus.NOT_FOUND, e.getMessage(), e);
+        } catch (BadValueException e) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, e.getMessage(), e);
         }
     }
 

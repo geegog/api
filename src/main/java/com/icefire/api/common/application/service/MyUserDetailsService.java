@@ -20,7 +20,7 @@ public class MyUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
         Optional<com.icefire.api.user.domain.model.User> optionalUser = userRepository.findByUsername(userName);
-        if(optionalUser == null) {
+        if(!optionalUser.isPresent()) {
             throw new UsernameNotFoundException("User not found");
         }
 
