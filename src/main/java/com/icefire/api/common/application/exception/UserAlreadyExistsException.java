@@ -10,6 +10,6 @@ public class UserAlreadyExistsException extends Exception  {
     }
 
     public UserAlreadyExistsException(UserDTO userDTO){
-        super("Username already exist!");
+        super(String.format("Username already exist! (Record id: %s)", userDTO.getUsername()));
     }
 }

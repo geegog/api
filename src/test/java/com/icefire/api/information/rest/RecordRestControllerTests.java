@@ -24,6 +24,11 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Objects;
 
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -39,7 +44,7 @@ public class RecordRestControllerTests {
     @Autowired
     private WebApplicationContext wac;
     private MockMvc mockMvc;
-    private final static String PATH = "src/main/resources/keys/";
+    private final static String PATH = "src/main/resources/keys";
 
     @Autowired @Qualifier("_halObjectMapper")
     ObjectMapper mapper;
@@ -49,14 +54,6 @@ public class RecordRestControllerTests {
     @Before
     public void setup() {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(this.wac).apply(springSecurity()).build();
-    }
-
-    @After
-    public void cleanUp() {
-        File directory = new File(PATH);
-        if (directory.exists()) {
-            directory.delete();
-        }
     }
 
     @Test
