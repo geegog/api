@@ -1,8 +1,6 @@
 package com.icefire.api.user.application.service;
 
-import com.icefire.api.common.application.exception.UserAlreadyExistsException;
 import com.icefire.api.common.application.exception.UserNotCreatedException;
-import com.icefire.api.common.infrastructure.security.MyKeyGenerator;
 import com.icefire.api.user.application.dto.UserDTO;
 import com.icefire.api.user.domain.model.User;
 import com.icefire.api.user.domain.repository.UserRepository;
@@ -43,10 +41,10 @@ public class UserService {
         return userEntity.orElse(null);
     }
 
-    public UserDTO addUser(UserDTO userDTO) throws UserNotCreatedException, UserAlreadyExistsException {
+    public UserDTO addUser(UserDTO userDTO) throws UserNotCreatedException {
 
         if (getUser(userDTO.getUsername()) != null) {
-            throw new UserAlreadyExistsException(userDTO);
+            throw new UserNotCreatedException("User already exists!");
         }
 
         User userEntity;

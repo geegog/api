@@ -9,6 +9,10 @@ public class UserNotCreatedException extends Exception  {
         super();
     }
 
+    public UserNotCreatedException(String message){
+        super(message);
+    }
+
     public UserNotCreatedException(UserDTO userDTO, Throwable cause){
         super(String.format("User not created! (User id: %d)", userDTO.get_id()), cause);
     }

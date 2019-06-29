@@ -1,6 +1,5 @@
 package com.icefire.api.user.rest;
 
-import com.icefire.api.common.application.exception.UserAlreadyExistsException;
 import com.icefire.api.common.application.exception.UserNotCreatedException;
 import com.icefire.api.user.application.dto.UserDTO;
 import com.icefire.api.user.application.service.UserService;
@@ -10,8 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-
-import java.util.ArrayList;
 
 @RestController
 @RequestMapping("/api/user")
@@ -28,7 +25,7 @@ public class UserRestController {
         }
         try {
             return new ResponseEntity<>(userService.addUser(userDTO), HttpStatus.CREATED);
-        } catch (UserNotCreatedException | UserAlreadyExistsException e) {
+        } catch (UserNotCreatedException e) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST, e.getMessage(), e);
         }
