@@ -22,7 +22,7 @@ public class MyKeyGenerator {
     public static SecretKey keyGenerator() {
         try {
             KeyGenerator kpg = KeyGenerator.getInstance("AES");
-            kpg.init(128);
+            kpg.init(256);
             return kpg.generateKey();
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
