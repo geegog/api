@@ -4,6 +4,8 @@ import com.google.common.base.Throwables;
 import com.icefire.api.common.application.exception.BadValueException;
 import com.icefire.api.common.application.exception.RecordNotFoundException;
 import com.icefire.api.common.application.exception.UserNotFoundException;
+import com.icefire.api.common.infrastructure.security.AESCipher;
+import com.icefire.api.common.infrastructure.security.MyKeyGenerator;
 import com.icefire.api.common.infrastructure.security.RSACipher;
 import com.icefire.api.information.application.dto.RecordDTO;
 import com.icefire.api.information.domain.model.Record;
@@ -16,8 +18,7 @@ import org.springframework.hateoas.Resources;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 
-import java.security.PrivateKey;
-import java.security.PublicKey;
+import javax.crypto.SecretKey;
 import java.time.LocalDateTime;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
@@ -55,19 +56,25 @@ public class RecordService {
         return recordAssembler.toResource(recordRepository.findById(id).orElse(null));
     }
 
-    public RecordDTO encrypt(String value, PublicKey publicKey, String username) throws UserNotFoundException {
-        RSACipher rsaCipher = new RSACipher(publicKey);
-
-        String encryptedMessage = rsaCipher.getEncryptedMessage(value);
-
+    public RecordDTO encrypt(String value, String username) throws UserNotFoundException {
         User user = userService.getUser(username);
 
         if (user == null) {
-            throw new UserNotFoundException(username, Throwables.getRootCause(new Throwable("Record does not exist!")));
+            throw new UserNotFoundException(username, Throwables.getRootCause(new Throwable("User does not exist!")));
         }
+
+        SecretKey secretKey = MyKeyGenerator.keyGenerator();
+        byte[] iv = MyKeyGenerator.generatorIV();
+        AESCipher aesCipher = new AESCipher(secretKey, iv);
+
+        String encryptedMessage = aesCipher.getEncryptedMessage(value);
 
         Record record = new Record();
         record.setValue(encryptedMessage);
+
+        user.setPublicKey(MyKeyGenerator.keyPairGenerator(username, secretKey, iv));
+        userService.saveUser(user);
+
         record.setUser(user);
 
         Record recordEntity = null;
@@ -80,10 +87,21 @@ public class RecordService {
         return recordAssembler.toResource(recordEntity);
     }
 
-    public RecordDTO encrypt(String value, PublicKey publicKey, String username, Long id) throws RecordNotFoundException {
-        RSACipher rsaCipher = new RSACipher(publicKey);
+    public RecordDTO encrypt(String value, String username, Long id) throws RecordNotFoundException, UserNotFoundException {
+        User user = userService.getUser(username);
 
-        String encryptedMessage = rsaCipher.getEncryptedMessage(value);
+        if (user == null) {
+            throw new UserNotFoundException(username, Throwables.getRootCause(new Throwable("User does not exist! User may have been deleted")));
+        }
+
+        SecretKey secretKey = MyKeyGenerator.keyGenerator();
+        byte[] iv = MyKeyGenerator.generatorIV();
+        AESCipher aesCipher = new AESCipher(secretKey, iv);
+
+        String encryptedMessage = aesCipher.getEncryptedMessage(value);
+
+        user.setPublicKey(MyKeyGenerator.keyPairGenerator(username, secretKey, iv));
+        userService.saveUser(user);
 
         Record record = recordRepository.findById(id).orElse(null);
         if (record == null) {
@@ -103,9 +121,7 @@ public class RecordService {
         return recordAssembler.toResource(recordEntity);
     }
 
-    public RecordDTO decrypt(String value, PrivateKey privateKey, Long id) throws RecordNotFoundException, BadValueException {
-        RSACipher rsaCipher = new RSACipher(privateKey);
-
+    public RecordDTO decrypt(String value, Long id, String username) throws RecordNotFoundException, BadValueException {
         RecordDTO record = recordAssembler.toResource(recordRepository.findById(id).orElse(null));
 
         if (record == null) {
@@ -116,7 +132,13 @@ public class RecordService {
             throw new BadValueException();
         }
 
-        record.setValue(rsaCipher.getDecryptedMessage(value));
+        User user = userService.getUser(username);
+
+        RSACipher rsaCipher = new RSACipher(MyKeyGenerator.getPrivateKey(username));
+
+        AESCipher aesCipher = new AESCipher(MyKeyGenerator.getSecretKey(username, rsaCipher.decryptedKey(user.getPublicKey())), MyKeyGenerator.getIV(username));
+
+        record.setValue(aesCipher.getDecryptedMessage(value));
         return record;
     }
 

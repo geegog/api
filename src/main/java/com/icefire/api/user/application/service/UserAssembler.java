@@ -36,7 +36,8 @@ public class UserAssembler extends ResourceAssemblerSupport<User, UserDTO> {
         dto.setPassword(user.getPassword());
         dto.setUsername(user.getUsername());
         dto.setUpdated(user.getUpdated());
-        dto.setPublicKey(Base64.getEncoder().encodeToString(user.getPublicKey()));
+        if (user.getPublicKey() != null)
+            dto.setPublicKey(Base64.getEncoder().encodeToString(user.getPublicKey()));
 
         dto.add(linkTo(methodOn(RecordRestController.class)
                 .allUserRecords(dto.get_id())).withRel("records").withType(HttpMethod.GET.toString()));

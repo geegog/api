@@ -1,7 +1,9 @@
 package com.icefire.api.common.infrastructure.security;
 
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -10,14 +12,30 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
+import java.util.Objects;
+import java.util.Random;
 
-import static java.lang.System.out;
-
-public class KeyGenerator {
+public class MyKeyGenerator {
 
     final static String PATH = "src/main/resources/keys/";
 
-    public static byte[] keyPairGenerator(String username) {
+    public static SecretKey keyGenerator() {
+        try {
+            KeyGenerator kpg = KeyGenerator.getInstance("AES");
+            kpg.init(128);
+            return kpg.generateKey();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static byte[] generatorIV() {
+        SecureRandom secureRandom = new SecureRandom();
+        return secureRandom.generateSeed(16);
+    }
+
+    public static byte[] keyPairGenerator(String username, SecretKey secretKey, byte[] iv) {
         byte[] publicKeyBytes = new byte[0];
         try {
             KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
@@ -26,10 +44,16 @@ public class KeyGenerator {
             PublicKey pub = kp.getPublic(); // X.509 format
             PrivateKey pvt = kp.getPrivate(); // PKCS#8 format
 
-            //safe private
+            //save private
             savePrivateKeyToFile(pvt, username);
 
-            publicKeyBytes = pub.getEncoded();
+            //save iv
+            saveIVToFile(iv, username);
+
+            RSACipher rsaCipher = new RSACipher(pub);
+            publicKeyBytes = rsaCipher.encryptedKey(Objects.requireNonNull(secretKey));
+
+            //publicKeyBytes = pub.getEncoded();
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
@@ -37,10 +61,9 @@ public class KeyGenerator {
     }
 
     public static PrivateKey getPrivateKey(String username) {
-        byte[] privateKeyBytes = new byte[0];
         try {
             /* Read all bytes from the private key file */
-            Path path = Paths.get(PATH + username + "_" + ".key");
+            Path path = Paths.get(PATH + username + "_private" + ".key");
             byte[] bytes = Files.readAllBytes(path);
 
             /* Generate private key. */
@@ -54,6 +77,24 @@ public class KeyGenerator {
 
         return null;
 
+    }
+
+    public static byte[] getIV(String username) {
+        try {
+            /* Read all bytes from the private key file */
+            Path path = Paths.get(PATH + username + "_iv" + ".txt");
+            return Files.readAllBytes(path);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+
+    }
+
+    public static SecretKey getSecretKey(String username, byte[] decryptedKey) {
+        return new SecretKeySpec(decryptedKey, 0, decryptedKey.length, "AES");
     }
 
     public static PublicKey getPublicKey(String base64PublicKey){
@@ -71,8 +112,17 @@ public class KeyGenerator {
 
     private static void savePrivateKeyToFile(PrivateKey privateKey, String username) {
         try {
-            Path path = Paths.get(PATH + username + "_" + ".key");
+            Path path = Paths.get(PATH + username + "_private" + ".key");
             Files.write(path, privateKey.getEncoded());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void saveIVToFile(byte[] vi, String username) {
+        try {
+            Path path = Paths.get(PATH + username + "_iv" + ".txt");
+            Files.write(path, vi);
         } catch (IOException e) {
             e.printStackTrace();
         }

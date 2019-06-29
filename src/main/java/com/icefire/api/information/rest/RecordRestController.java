@@ -3,7 +3,7 @@ package com.icefire.api.information.rest;
 import com.icefire.api.common.application.exception.BadValueException;
 import com.icefire.api.common.application.exception.RecordNotFoundException;
 import com.icefire.api.common.application.exception.UserNotFoundException;
-import com.icefire.api.common.infrastructure.security.KeyGenerator;
+import com.icefire.api.common.infrastructure.security.MyKeyGenerator;
 import com.icefire.api.information.application.dto.DataDTO;
 import com.icefire.api.information.application.service.RecordService;
 import com.icefire.api.user.application.dto.UserDTO;
@@ -39,7 +39,7 @@ public class RecordRestController {
         String username = Objects.requireNonNull(authUser()).getUsername();
         UserDTO userDTO = userService.getUserDTO(username);
         try {
-            return new ResponseEntity<>(recordService.encrypt(dataDTO.getValue(), KeyGenerator.getPublicKey(userDTO.getPublicKey()), username), HttpStatus.OK);
+            return new ResponseEntity<>(recordService.encrypt(dataDTO.getValue(), username), HttpStatus.OK);
         } catch (UserNotFoundException e) {
             throw new ResponseStatusException(
                     HttpStatus.NOT_FOUND, e.getMessage(), e);
@@ -55,8 +55,8 @@ public class RecordRestController {
         String username = Objects.requireNonNull(authUser()).getUsername();
         UserDTO userDTO = userService.getUserDTO(username);
         try {
-            return new ResponseEntity<>(recordService.encrypt(dataDTO.getValue(), KeyGenerator.getPublicKey(userDTO.getPublicKey()), username, id), HttpStatus.OK);
-        } catch (RecordNotFoundException e) {
+            return new ResponseEntity<>(recordService.encrypt(dataDTO.getValue(), username, id), HttpStatus.OK);
+        } catch (RecordNotFoundException | UserNotFoundException e) {
             throw new ResponseStatusException(
                     HttpStatus.NOT_FOUND, e.getMessage(), e);
         }
@@ -71,7 +71,7 @@ public class RecordRestController {
         String username = Objects.requireNonNull(authUser()).getUsername();
         UserDTO userDTO = userService.getUserDTO(username);
         try {
-            return new ResponseEntity<>(recordService.decrypt(dataDTO.getValue(), KeyGenerator.getPrivateKey(username), id), HttpStatus.OK);
+            return new ResponseEntity<>(recordService.decrypt(dataDTO.getValue(), id, username), HttpStatus.OK);
         } catch (RecordNotFoundException e) {
             throw new ResponseStatusException(
                     HttpStatus.NOT_FOUND, e.getMessage(), e);

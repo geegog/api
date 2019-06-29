@@ -2,10 +2,7 @@ package com.icefire.api.common.infrastructure.security;
 
 import com.google.common.io.BaseEncoding;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
+import javax.crypto.*;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.InvalidKeyException;
 import java.security.Key;
@@ -66,5 +63,38 @@ public class RSACipher {
         return decValBase64;
     }
 
+    /**
+     * Takes SecretKey key and encodes with provided key
+     *
+     * @param secretKey SecretKey
+     * @return String
+     */
+    byte[] encryptedKey(SecretKey secretKey) {
+        try {
+            Cipher cipher = Cipher.getInstance(ALGORITHM_RSA);
+            cipher.init(Cipher.PUBLIC_KEY, key);
+            return cipher.doFinal(secretKey.getEncoded());
+        } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | BadPaddingException | IllegalBlockSizeException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * Takes encryptedKey key and decodes with provided key
+     *
+     * @param encryptedKey byte[]
+     * @return String
+     */
+    public byte[] decryptedKey(byte[] encryptedKey) {
+        try {
+            Cipher cipher = Cipher.getInstance(ALGORITHM_RSA);
+            cipher.init(Cipher.PRIVATE_KEY, key);
+            return cipher.doFinal(encryptedKey);
+        } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | BadPaddingException | IllegalBlockSizeException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
 }
