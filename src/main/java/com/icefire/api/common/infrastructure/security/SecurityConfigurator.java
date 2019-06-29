@@ -37,8 +37,9 @@ public class SecurityConfigurator extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers("/h2-console").permitAll()
                 .antMatchers("/api/user/register").permitAll()
+                .antMatchers("/api/logout").permitAll()
                 .anyRequest().authenticated()
                 .and().httpBasic()
-                .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+                .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.ALWAYS);
     }
 }

@@ -10,6 +10,7 @@ import com.icefire.api.user.application.dto.UserDTO;
 import com.icefire.api.user.application.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
@@ -81,14 +82,14 @@ public class RecordRestController {
         }
     }
 
-    @GetMapping("/{userId}/records")
+    @GetMapping(value = "/{userId}/records", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> allUserRecords(@PathVariable Long userId) {
         String username = Objects.requireNonNull(authUser()).getUsername();
         UserDTO userDTO = userService.getUserDTO(username);
         return new ResponseEntity<>(recordService.allUserRecords(userId), HttpStatus.OK);
     }
 
-    @GetMapping("/records")
+    @GetMapping(value = "/records", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> allRecords() {
         String username = Objects.requireNonNull(authUser()).getUsername();
         UserDTO userDTO = userService.getUserDTO(username);
