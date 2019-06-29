@@ -44,7 +44,6 @@ public class RecordRestControllerTests {
     @Autowired
     private WebApplicationContext wac;
     private MockMvc mockMvc;
-    private final static String PATH = "src/main/resources/keys";
 
     @Autowired @Qualifier("_halObjectMapper")
     ObjectMapper mapper;
