@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.icefire.api.ApiApplication;
 import com.icefire.api.information.application.dto.RecordDTO;
 import com.icefire.api.user.application.dto.UserDTO;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,6 +23,8 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.io.File;
+
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -36,6 +39,7 @@ public class RecordRestControllerTests {
     @Autowired
     private WebApplicationContext wac;
     private MockMvc mockMvc;
+    private final static String PATH = "src/main/resources/keys/";
 
     @Autowired @Qualifier("_halObjectMapper")
     ObjectMapper mapper;
@@ -45,6 +49,14 @@ public class RecordRestControllerTests {
     @Before
     public void setup() {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(this.wac).apply(springSecurity()).build();
+    }
+
+    @After
+    public void cleanUp() {
+        File directory = new File(PATH);
+        if (directory.exists()) {
+            directory.delete();
+        }
     }
 
     @Test

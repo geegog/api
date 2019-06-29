@@ -1,5 +1,6 @@
 package com.icefire.api.user.rest;
 
+import com.icefire.api.common.application.exception.UserAlreadyExistsException;
 import com.icefire.api.common.application.exception.UserNotCreatedException;
 import com.icefire.api.user.application.dto.UserDTO;
 import com.icefire.api.user.application.service.UserService;
@@ -27,9 +28,9 @@ public class UserRestController {
         }
         try {
             return new ResponseEntity<>(userService.addUser(userDTO), HttpStatus.CREATED);
-        } catch (UserNotCreatedException e) {
+        } catch (UserNotCreatedException | UserAlreadyExistsException e) {
             throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, e.getMessage() + ". Username already exist!", e);
+                    HttpStatus.BAD_REQUEST, e.getMessage(), e);
         }
     }
 

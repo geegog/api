@@ -3,6 +3,7 @@ package com.icefire.api.common.infrastructure.security;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -17,7 +18,7 @@ import java.util.Random;
 
 public class MyKeyGenerator {
 
-    final static String PATH = "src/main/resources/keys/";
+    private final static String PATH = "src/main/resources/keys/";
 
     public static SecretKey keyGenerator() {
         try {
@@ -111,6 +112,7 @@ public class MyKeyGenerator {
     }
 
     private static void savePrivateKeyToFile(PrivateKey privateKey, String username) {
+        creatFolderIfNotExit();
         try {
             Path path = Paths.get(PATH + username + "_private" + ".key");
             Files.write(path, privateKey.getEncoded());
@@ -120,11 +122,19 @@ public class MyKeyGenerator {
     }
 
     private static void saveIVToFile(byte[] vi, String username) {
+        creatFolderIfNotExit();
         try {
             Path path = Paths.get(PATH + username + "_iv" + ".txt");
             Files.write(path, vi);
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    private static void creatFolderIfNotExit() {
+        File directory = new File(PATH);
+        if (!directory.exists()) {
+            directory.mkdir();
         }
     }
 
