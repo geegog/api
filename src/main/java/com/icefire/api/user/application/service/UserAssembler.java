@@ -40,7 +40,7 @@ public class UserAssembler extends ResourceAssemblerSupport<User, UserDTO> {
             dto.setPublicKey(Base64.getEncoder().encodeToString(user.getPublicKey()));
 
         dto.add(linkTo(methodOn(RecordRestController.class)
-                .allUserRecords(dto.get_id())).withRel("records").withType(HttpMethod.GET.toString()));
+                .allUserRecords(dto.getUsername())).withRel("records").withType(HttpMethod.GET.toString()));
 
         dto.add(linkTo(methodOn(RecordRestController.class)
                 .encrypt(new DataDTO())).withRel("encrypt").withType(HttpMethod.POST.toString()));
